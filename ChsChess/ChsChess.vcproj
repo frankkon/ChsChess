@@ -186,11 +186,51 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Bing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ChnChessTable.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ChsChess.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ChsChessDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Ju.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Log.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Ma.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Match.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Pao.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Piece.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Shi.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Shuai.cpp"
 				>
 			</File>
 			<File
@@ -213,12 +253,24 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\Xiang.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Bing.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ChnChessTable.h"
+				>
+			</File>
 			<File
 				RelativePath=".\ChsChess.h"
 				>
@@ -228,7 +280,39 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Ju.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Log.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Ma.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Match.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Pao.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Piece.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Shi.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Shuai.h"
 				>
 			</File>
 			<File
@@ -237,6 +321,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Xiang.h"
 				>
 			</File>
 		</Filter>
