@@ -39,7 +39,10 @@
 #define PIECE_SIZE     52
 
 CChsChessDlg::CChsChessDlg(CWnd* pParent /*=NULL*/)
-    : CDialog(CChsChessDlg::IDD, pParent),m_pMatch(NULL)
+    : CDialog(CChsChessDlg::IDD, pParent),
+      m_pMatch(NULL),
+      m_CachedTable(NULL),
+      m_iSelectedPieceName(NO_PIECE)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
     m_bClickedFlag = false;
@@ -48,6 +51,17 @@ CChsChessDlg::CChsChessDlg(CWnd* pParent /*=NULL*/)
     {
         m_PieceImageList[i] = NULL;
     }
+
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 9; j++)
+        {
+            (m_PointRectMap[i][j]).SetPoint(0, 0);
+        }
+    }
+
+    m_ptSrcOfActPiece.SetPoint(0, 0);
+    m_ptDesOfActPiece.SetPoint(0, 0);
 
 }
 
@@ -63,6 +77,9 @@ BEGIN_MESSAGE_MAP(CChsChessDlg, CDialog)
     ON_BN_CLICKED(IDC_CANCEL, &CChsChessDlg::OnBnClickedCancel)
     ON_WM_LBUTTONUP()
     ON_BN_CLICKED(IDC_BUTTON_START, &CChsChessDlg::OnBnClickedButtonStart)
+    ON_BN_CLICKED(IDC_BUTTON_DRAW, &CChsChessDlg::OnBnClickedButtonDraw)
+    ON_BN_CLICKED(IDC_BUTTON_FAIL, &CChsChessDlg::OnBnClickedButtonFail)
+    ON_BN_CLICKED(IDC_BUTTON_BACK, &CChsChessDlg::OnBnClickedButtonBack)
 END_MESSAGE_MAP()
 
 
@@ -117,11 +134,9 @@ void CChsChessDlg::OnPaint()
         CDialog::OnPaint();
     }
 
-    //绘制棋盘
-    drawTable();
-
-    //绘制棋子
-    drawPieces();
+    //更新棋盘
+    updateTable();
+    showMatchView();
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
@@ -155,8 +170,8 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
         return;
     }
 
-    CClientDC dc(this);
-    Gdiplus::Graphics graphics(dc);
+    //CClientDC dc(this);
+    //Gdiplus::Graphics graphics(dc);
 
     CPoint ptTablePosRect;
     TPosition tmpPos;
@@ -164,26 +179,25 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
     {
         if(m_bClickedFlag)//之前选中了棋子
         {
-            //检查是否走棋一方单击了本方另一个棋子
             CChnChessTable tbl = m_pMatch->getTable();
             int iTmpPieceName = tbl.getPieceNameByPos(tmpPos);
             if(NO_PIECE != iTmpPieceName)
             {
                 CPiece* pPiece = m_pMatch->getPieceByName(iTmpPieceName);
+
+                //检查是否走棋一方单击了本方另一个棋子
                 if(pPiece->getType() == m_pMatch->getGoSide())
                 {
-                    //暂存本次选中的棋子
+                    //存储本次选中的棋子
                     m_iSelectedPieceName = iTmpPieceName;
                     m_bClickedFlag = true;
 
-                    //先清除之前的矩形
-                    //graphics.IntersectClip(Gdiplus::Rect(m_ptSrcOfActPiece.x, m_ptSrcOfActPiece.y,
-                    //    PIECE_SIZE, PIECE_SIZE));
-                    //graphics.IntersectClip(Gdiplus::Rect(m_ptDesOfActPiece.x, m_ptDesOfActPiece.y,
-                    //    PIECE_SIZE, PIECE_SIZE));
-                    m_ptSrcOfActPiece = point;
-                    Gdiplus::Point pt(ptTablePosRect.x, ptTablePosRect.y);
-                    graphics.DrawImage(m_PieceImageList[POS_SRC], pt);
+                    //重绘棋盘
+                    drawBlankTable();
+                    drawPieces();
+                    m_ptSrcOfActPiece = ptTablePosRect;
+                    drawSrcOfActPieceFlag();
+                    showMatchView();
                     return;
                 }
             }
@@ -191,15 +205,21 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
             //执行走棋
             if(m_pMatch->go(m_iSelectedPieceName, tmpPos))
             {
-                m_ptDesOfActPiece = point;
-                Gdiplus::Point pt(ptTablePosRect.x, ptTablePosRect.y);
-
-                //Gdiplus::Rect rt(m_ptSrcOfActPiece.x, m_ptSrcOfActPiece.y, PIECE_SIZE, PIECE_SIZE);
-                //graphics.SetClip(rt);
-                //graphics.IntersectClip(rt);
-                graphics.DrawImage(m_PieceImageList[m_iSelectedPieceName], pt);
-                graphics.DrawImage(m_PieceImageList[POS_DES], pt);
+                //重绘棋盘
                 m_bClickedFlag = false;
+                m_ptDesOfActPiece = ptTablePosRect;
+                updateTable();
+                showMatchView();
+
+                if(m_pMatch->isEnd(m_pMatch->getGoSide()))
+                {
+                    ::MessageBox(m_hWnd, sEndInfo[m_pMatch->getGoSide()], _T("游戏结束"), MB_OK);
+                    m_pMatch->finish();
+                    m_pMatch = NULL;
+                    initMatchView();
+                    showMatchView();
+                    return;
+                }
             }
             else
             {
@@ -208,29 +228,27 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
         }
         else  //之前没有选中棋子
         {
-            //检查是否走棋一方单击了本方棋子
             CChnChessTable tbl = m_pMatch->getTable();
             int iTmpPieceName = tbl.getPieceNameByPos(tmpPos);
             if(NO_PIECE != iTmpPieceName)
             {
                 CPiece* pPiece = m_pMatch->getPieceByName(iTmpPieceName);
+                //检查是否走棋一方单击了本方棋子
                 if(pPiece->getType() != m_pMatch->getGoSide())
                 {
                     return;
                 }
 
-                //暂存本次选中的棋子
+                //重绘棋盘
+                drawBlankTable();
+                drawPieces();
+                m_ptSrcOfActPiece = ptTablePosRect;
+                drawSrcOfActPieceFlag();
+                showMatchView();
+
+                //存储本次选中的棋子
                 m_iSelectedPieceName = iTmpPieceName;
                 m_bClickedFlag = true;
-
-                //先清除之前的矩形
-                //graphics.IntersectClip(Gdiplus::Rect(m_ptSrcOfActPiece.x, m_ptSrcOfActPiece.y,
-                //    PIECE_SIZE, PIECE_SIZE));
-                //graphics.IntersectClip(Gdiplus::Rect(m_ptDesOfActPiece.x, m_ptDesOfActPiece.y,
-                //    PIECE_SIZE, PIECE_SIZE));
-                m_ptSrcOfActPiece = point;
-                Gdiplus::Point pt(ptTablePosRect.x, ptTablePosRect.y);
-                graphics.DrawImage(m_PieceImageList[POS_SRC], pt);
             }
 
         }
@@ -243,6 +261,11 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
 BOOL CChsChessDlg::DestroyWindow()
 {
     //清理棋子、棋盘图片
+    if(NULL != m_CachedTable)
+    {
+        delete m_CachedTable;
+        m_CachedTable = NULL;
+    }
     if(NULL != m_PieceImageList)
     {
         for(int i = 1; i < 1+32+3; i++)
@@ -253,7 +276,11 @@ BOOL CChsChessDlg::DestroyWindow()
     }
 
     //结束棋局
-    m_pMatch->finish();
+    if(NULL != m_pMatch)
+    {
+        delete m_pMatch;
+        m_pMatch = NULL;
+    }
 
     return CDialog::DestroyWindow();
 }
@@ -272,7 +299,9 @@ void CChsChessDlg::OnBnClickedButtonStart()
 
     if(m_pMatch->init())
     {
+        drawBlankTable();
         drawPieces();
+        showMatchView();
     }
     else
     {
@@ -378,14 +407,7 @@ void CChsChessDlg::initChessData(void)
     m_PieceImageList[POS_SRC]  = ::new Gdiplus::Image(L"res\\初始位.png");
     m_PieceImageList[POS_DES]  = ::new Gdiplus::Image(L"res\\目标位.png");
 
-}
-
-// 画棋盘
-void CChsChessDlg::drawTable(void)
-{
-    CClientDC dc(this);
-    Gdiplus::Graphics graphics(dc);
-    graphics.DrawImage(m_PieceImageList[TABLE], 0, 0);
+    m_CachedTable = ::new Gdiplus::Image(L"res\\棋盘.png");
 
 }
 
@@ -397,8 +419,9 @@ void CChsChessDlg::drawPieces(void)
         return;
     }
 
-    CClientDC dc(this);
-    Gdiplus::Graphics graphics(dc);
+    //CClientDC dc(this);
+    //Gdiplus::Graphics graphics(dc);
+    Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
 
 
     CPiece* pPiece = NULL;
@@ -407,11 +430,138 @@ void CChsChessDlg::drawPieces(void)
     {
         pPiece = m_pMatch->getPieceByName(i);
         pos = pPiece->getPos();
-        graphics.DrawImage(m_PieceImageList[i], m_PointRectMap[pos.row][pos.col].x, m_PointRectMap[pos.row][pos.col].y);
+        graphics->DrawImage(m_PieceImageList[i], 
+            m_PointRectMap[pos.row][pos.col].x, m_PointRectMap[pos.row][pos.col].y);
+    }
+    delete graphics;
+
+}
+
+//走棋后更新棋盘
+void CChsChessDlg::updateTable(void)
+{
+    drawBlankTable();
+    drawPieces();
+    drawActPieceFlag();
+}
+
+// 画空棋盘
+void CChsChessDlg::drawBlankTable(void)
+{
+    //CClientDC dc(this);
+    //Gdiplus::Graphics graphics(dc);
+    Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
+    graphics->DrawImage(m_PieceImageList[TABLE], 0, 0);
+    delete graphics;
+}
+
+void CChsChessDlg::drawActPieceFlag(void)
+{
+    drawSrcOfActPieceFlag();
+    drawDesOfActPieceFlag();
+}
+
+void CChsChessDlg::drawSrcOfActPieceFlag(void)
+{
+    if(0 == m_ptSrcOfActPiece.x && 0 == m_ptSrcOfActPiece.y)
+    {
+        return;
     }
 
+    //CClientDC dc(this);
+    //Gdiplus::Graphics graphics(dc);
+    Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
+    graphics->DrawImage(m_PieceImageList[POS_SRC], m_ptSrcOfActPiece.x, m_ptSrcOfActPiece.y);
+    delete graphics;
+}
+
+void CChsChessDlg::drawDesOfActPieceFlag(void)
+{
+    if(0 == m_ptDesOfActPiece.x && 0 == m_ptDesOfActPiece.y)
+    {
+        return;
+    }
+
+    //CClientDC dc(this);
+    //Gdiplus::Graphics graphics(dc);
+    Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
+    graphics->DrawImage(m_PieceImageList[POS_DES], m_ptDesOfActPiece.x, m_ptDesOfActPiece.y);
+    delete graphics;
+}
+
+void CChsChessDlg::initMatchView(void)
+{
+    m_bClickedFlag = false;
+    m_iSelectedPieceName = NO_PIECE;
+    m_ptSrcOfActPiece.SetPoint(0, 0);
+    m_ptDesOfActPiece.SetPoint(0, 0);
+
+    drawBlankTable();
+    drawPieces();
+}
+
+//将缓存中画好的棋盘显示出来
+void CChsChessDlg::showMatchView(void)
+{
+    CClientDC dc(this);
+    Gdiplus::Graphics graphics(dc);
+    graphics.DrawImage(m_CachedTable, 0, 0);
 }
 
 
 
+void CChsChessDlg::OnBnClickedButtonDraw()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
 
+    ::MessageBox(m_hWnd, sEndInfo[0], _T("游戏结束"), MB_OK);
+    m_pMatch->finish();
+    m_pMatch = NULL;
+    initMatchView();
+    showMatchView();
+}
+
+void CChsChessDlg::OnBnClickedButtonFail()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
+
+    ::MessageBox(m_hWnd, sEndInfo[ RED == m_pMatch->getGoSide() ? BLACK : RED ], _T("游戏结束"), MB_OK);
+    m_pMatch->finish();
+    m_pMatch = NULL;
+    initMatchView();
+    showMatchView();
+}
+
+void CChsChessDlg::OnBnClickedButtonBack()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
+
+    TStepInfo step = m_pMatch->goBack();
+
+    if(0 != step.m_iDesPiece)
+    {
+        drawBlankTable();
+        drawPieces();
+
+        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
+        int cx = m_PointRectMap[step.m_Src.row][step.m_Src.col].x;
+        int cy = m_PointRectMap[step.m_Src.row][step.m_Src.col].y;
+        graphics->DrawImage(m_PieceImageList[POS_SRC], cx, cy);
+        cx = m_PointRectMap[step.m_Des.row][step.m_Des.col].x;
+        cy = m_PointRectMap[step.m_Des.row][step.m_Des.col].y;
+        graphics->DrawImage(m_PieceImageList[POS_DES], cx, cy);
+        delete graphics;
+
+        showMatchView();
+    }
+
+}

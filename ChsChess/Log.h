@@ -24,6 +24,7 @@ public:
 
     void setLogLevel(int iLogLevel);
     void openLogFile(const char* strFilename);
+    void closeLogFile();
     void logDebug(const char* strLog);
     void logInfo(const char* strLog);
     void logWarn(const char* strLog);

@@ -18,9 +18,18 @@ CChnChessTable::~CChnChessTable(void)
 {
 }
 
+//清空棋盘
+void CChnChessTable::clean()
+{
+    memset(iArrChnChessTable, 0, sizeof(iArrChnChessTable));
+}
+
 //初始化棋盘
 void CChnChessTable::init()
 {
+    //先清理
+    memset(iArrChnChessTable, 0, sizeof(iArrChnChessTable));
+
     iArrChnChessTable[9][0] = JU_LEFT_RED;
     iArrChnChessTable[9][8] = JU_RIGHT_RED;
     iArrChnChessTable[9][1] = MA_LEFT_RED;

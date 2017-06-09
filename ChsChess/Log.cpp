@@ -45,6 +45,11 @@ void CLog::openLogFile(const char* strFilename)
     logFile.open(strFilename);
 }
 
+void CLog::closeLogFile()
+{
+    logFile.close();
+}
+
 void CLog::logDebug(const char* strLog)
 {
     if(logFile && LOG_DEBUG <= m_iLogLevel)

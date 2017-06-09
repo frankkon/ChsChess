@@ -37,6 +37,9 @@ protected:
     //棋子与棋子图片映射关系表（包含棋盘、走棋位置提示标志，放在列表最后面）
     Gdiplus::Image* m_PieceImageList[1+32+3]; 
 
+    //双缓存
+    Gdiplus::Image* m_CachedTable;
+
     //一场棋局
     CMatch* m_pMatch;
 
@@ -64,11 +67,14 @@ public:
     afx_msg void OnBnClickedCancel();
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
     afx_msg void OnBnClickedButtonStart();
+    afx_msg void OnBnClickedButtonDraw();
+    afx_msg void OnBnClickedButtonFail();
+    afx_msg void OnBnClickedButtonBack();
 
     virtual BOOL DestroyWindow();
 
-    //画棋盘
-    void drawTable(void);
+    //画空棋盘
+    void drawBlankTable(void);
 
     // 根据给定的点找到对应棋盘上的位置映射的矩形top-left位置
     bool getTablePos(const CPoint& ptClk, TPosition& pos, CPoint& ptTablePosRect);
@@ -79,8 +85,21 @@ public:
     //初始化棋盘、棋子相关数据
     void initChessData(void);
 
+    //初始化棋局界面
+    void initMatchView(void);
+
+    //将缓存中画好的棋盘显示出来
+    void showMatchView(void);
+
     //根据棋子在棋盘上的位置逐个画到棋盘上
     void drawPieces(void);
 
+    //走棋后更新棋盘
+    void updateTable(void);
+
+    //画当前移动棋子的矩形亮框
+    void drawActPieceFlag(void);
+    void drawSrcOfActPieceFlag(void);
+    void drawDesOfActPieceFlag(void);
 
 };

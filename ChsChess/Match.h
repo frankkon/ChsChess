@@ -10,6 +10,8 @@ class CPiece;
 
 #define NORMAL_BUF_SIZE       128
 
+static const char* sEndInfo[3] = {"和棋！啦啦啦！", "红方胜！耶耶耶！", "黑方胜！哦哦哦！"};
+
 class CMatch
 {
 public:
@@ -35,7 +37,7 @@ public:
     bool isEnd(int iType);
 
     //悔棋
-    void goBack();
+    TStepInfo goBack();
 
     //结束一局比赛
     void finish();

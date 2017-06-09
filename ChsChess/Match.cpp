@@ -15,7 +15,6 @@
 #include "Xiang.h"
 #include "Bing.h"
 
-static const char* sEndInfo[3] = {"和棋！", "红方胜！", "黑方胜！"};
 
 CMatch::CMatch(void):m_vPieces(33),m_iGoSide(RED)
 {
@@ -45,11 +44,6 @@ CPiece* CMatch::getPieceByName(int iPieceName)
 bool CMatch::init()
 {
     //先清理
-    memset(m_sMatchID, 0, sizeof(m_sMatchID));
-    while(!m_stackHistory.empty())
-    {
-        m_stackHistory.pop();
-    }
     clean();
     
     createMatchID();
@@ -202,8 +196,6 @@ bool CMatch::go(int iPieceName, TPosition pos)
 
     if(pPiece->move(pos, this))
     {
-        swapGoSide(m_iGoSide);
-
         //如果是吃子，把被吃的子的位置移到棋盘外。
         if(NO_PIECE != step.m_iDesPiece)
         {
@@ -223,17 +215,25 @@ bool CMatch::go(int iPieceName, TPosition pos)
         step.m_iDesPiece = NO_PIECE; //正常走棋时，要把出棋位置置空
         m_vTable.update(step);
 
-        m_vTable.print();
+        //m_vTable.print();
         
         int iType = pPiece->getType();
         if(isEnd(iType))
         {
             m_logMatch.logInfo(sEndInfo[iType]);
             //std::cout<<sEndInfo[iType]<<std::endl;
+            //clean();
+            return true;
         }
+
+        swapGoSide(m_iGoSide);
+        return true;
+    }
+    else
+    {
+        return false;
     }
     
-    return true;
 }
 
 void CMatch::saveToHistory(TStepInfo step)
@@ -247,7 +247,7 @@ bool CMatch::isEnd(int iType)
 {
     m_logMatch.logDebug("进入CMatch::isEnd函数");
 
-    //如果iType所在一方的帅不在棋盘上了，则结束
+    //如果iType对方的帅不在棋盘上了，则结束
     CPiece* tmpPtrPiece = NULL;
     TPosition tmpPos;
     if(RED == iType)
@@ -282,13 +282,15 @@ bool CMatch::isEnd(int iType)
     return true;
 }
 
-void CMatch::goBack()
+TStepInfo CMatch::goBack()
 {
     m_logMatch.logDebug("进入CMatch::goBack函数");
 
     if(m_stackHistory.empty())
     {
-        return;
+        TStepInfo step;
+        memset(&step, 0, sizeof(step));
+        return step;
     }
 
     //将最近一步棋出栈
@@ -312,7 +314,8 @@ void CMatch::goBack()
     m_vTable.update(step);
 
     //重新打印棋盘
-    m_vTable.print();
+    //m_vTable.print();
+    return step;
 }
 
 bool CMatch::initPiece(int iName, int iType, int iRow, int iCol, CPiece* pPiece)
@@ -338,6 +341,11 @@ bool CMatch::initPiece(int iName, int iType, int iRow, int iCol, CPiece* pPiece)
 
 void CMatch::clean()
 {
+    m_iGoSide = RED;
+    memset(m_sMatchID, 0, sizeof(m_sMatchID));
+    m_logMatch.closeLogFile();
+    m_vTable.clean();
+
     for(size_t i = 0; i < m_vPieces.size(); i++)
     {
         if(NULL != m_vPieces[i])
@@ -346,6 +354,12 @@ void CMatch::clean()
             m_vPieces[i] = NULL;
         }
     }
+
+    while(!m_stackHistory.empty())
+    {
+        m_stackHistory.pop();
+    }
+
 }
 
 void CMatch::finish()

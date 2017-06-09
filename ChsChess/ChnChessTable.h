@@ -50,6 +50,9 @@ public:
     //初始化棋盘
     void init();
 
+    //清空棋盘
+    void clean();
+
     //将棋盘当前状态输出到屏幕
     void print();
 
