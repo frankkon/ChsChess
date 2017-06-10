@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+//#include "vld.h"
 #include "Xiang.h"
 #include "ChnChessTable.h"
 

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 //#include "vld.h"
-
 #include "Log.h"
 
 #include <ctime>
@@ -47,7 +46,7 @@ void CLog::openLogFile(const char* strFilename)
 
 void CLog::closeLogFile()
 {
-    logFile.close();
+	logFile.close();
 }
 
 void CLog::logDebug(const char* strLog)

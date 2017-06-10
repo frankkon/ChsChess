@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+//#include "vld.h"
 #include "ChsChess.h"
 #include "ChsChessDlg.h"
 #include "Match.h"
@@ -21,8 +22,12 @@
 #define BUTTON_WIDTH     80
 #define BUTTON_HEIGHT    25
 #define BUTTON_LEFT      (554 + (200 - 80)/2)
-#define BUTTON_TOP       300
+#define BUTTON_TOP       350
 #define BUTTON_INTERVAL  20
+#define LISTBOX_LEFT     (554 + 40)
+#define LISTBOX_TOP      20
+#define LISTBOX_WIDTH    120
+#define LISTBOX_HEIGHT   300
 
 //棋盘属性（像素）
 #define TABLE_WIDTH  554
@@ -170,9 +175,6 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
         return;
     }
 
-    //CClientDC dc(this);
-    //Gdiplus::Graphics graphics(dc);
-
     CPoint ptTablePosRect;
     TPosition tmpPos;
     if(getTablePos(point, tmpPos, ptTablePosRect))
@@ -205,6 +207,11 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
             //执行走棋
             if(m_pMatch->go(m_iSelectedPieceName, tmpPos))
             {
+                //打谱
+                CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_MANUAL);
+                std::string sManual = m_pMatch->getCurrentManual();
+                pList->InsertString(-1, sManual.c_str());
+
                 //重绘棋盘
                 m_bClickedFlag = false;
                 m_ptDesOfActPiece = ptTablePosRect;
@@ -288,25 +295,92 @@ BOOL CChsChessDlg::DestroyWindow()
 void CChsChessDlg::OnBnClickedButtonStart()
 {
     //创建棋局
-    if(NULL == m_pMatch)
+    if(NULL != m_pMatch)
     {
-        m_pMatch = new CMatch();
-        if(NULL == m_pMatch)
-        {
-            TRACE(_T("创建棋局失败！"));
-        }
+        delete m_pMatch;
+        m_pMatch = NULL;
     }
 
+    m_pMatch = new CMatch();
     if(m_pMatch->init())
     {
         drawBlankTable();
         drawPieces();
         showMatchView();
+
+        clearManual();
     }
     else
     {
         //初始化棋局失败
         TRACE(_T("初始化棋局失败！"));
+    }
+
+}
+
+void CChsChessDlg::OnBnClickedButtonDraw()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
+
+    ::MessageBox(m_hWnd, sEndInfo[0], _T("游戏结束"), MB_OK);
+    m_pMatch->finish();
+    m_pMatch = NULL;
+    initMatchView();
+    showMatchView();
+
+    clearManual();
+}
+
+void CChsChessDlg::OnBnClickedButtonFail()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
+
+    ::MessageBox(m_hWnd, sEndInfo[ RED == m_pMatch->getGoSide() ? BLACK : RED ], _T("游戏结束"), MB_OK);
+    m_pMatch->finish();
+    m_pMatch = NULL;
+    initMatchView();
+    showMatchView();
+
+    clearManual();
+}
+
+void CChsChessDlg::OnBnClickedButtonBack()
+{
+    if(NULL == m_pMatch)
+    {
+        return;
+    }
+
+    TStepInfo step = m_pMatch->goBack();
+
+    if(0 != step.m_iDesPiece)
+    {
+        //打谱信息回退
+        CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_MANUAL);
+        if(pList->GetCount() > 0)
+        {
+            pList->DeleteString(pList->GetCount() - 1);
+        }
+
+        drawBlankTable();
+        drawPieces();
+
+        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
+        int cx = m_PointRectMap[step.m_Src.row][step.m_Src.col].x;
+        int cy = m_PointRectMap[step.m_Src.row][step.m_Src.col].y;
+        graphics->DrawImage(m_PieceImageList[POS_SRC], cx, cy);
+        cx = m_PointRectMap[step.m_Des.row][step.m_Des.col].x;
+        cy = m_PointRectMap[step.m_Des.row][step.m_Des.col].y;
+        graphics->DrawImage(m_PieceImageList[POS_DES], cx, cy);
+        delete graphics;
+
+        showMatchView();
     }
 
 }
@@ -339,6 +413,10 @@ bool CChsChessDlg::getTablePos(const CPoint& ptClk, TPosition& pos, CPoint& ptTa
 //初始化软件界面
 void CChsChessDlg::initUI(void)
 {
+    //设置打谱ListBox的位置
+    CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_MANUAL);
+    pList->SetWindowPos(&wndTop, LISTBOX_LEFT, LISTBOX_TOP, LISTBOX_WIDTH, LISTBOX_HEIGHT, SWP_SHOWWINDOW);
+
     //设置按钮的位置
     CButton* pButton = NULL;
     pButton = (CButton*)GetDlgItem(IDC_BUTTON_START);
@@ -357,9 +435,10 @@ void CChsChessDlg::initUI(void)
     pButton->SetWindowPos(&wndTop, BUTTON_LEFT, 
         BUTTON_TOP + (BUTTON_HEIGHT + BUTTON_INTERVAL) * 3, BUTTON_WIDTH, BUTTON_HEIGHT, SWP_SHOWWINDOW);
     pButton = (CButton*)GetDlgItem(IDC_BUTTON_STEP);
-    pButton->SetWindowTextA(_T("打谱"));
-    pButton->SetWindowPos(&wndTop, BUTTON_LEFT, 
-        BUTTON_TOP + (BUTTON_HEIGHT + BUTTON_INTERVAL) * 4, BUTTON_WIDTH, BUTTON_HEIGHT, SWP_SHOWWINDOW);
+    pButton->ShowWindow(SW_HIDE);
+    //pButton->SetWindowTextA(_T("打谱"));
+    //pButton->SetWindowPos(&wndTop, BUTTON_LEFT, 
+    //    BUTTON_TOP + (BUTTON_HEIGHT + BUTTON_INTERVAL) * 4, BUTTON_WIDTH, BUTTON_HEIGHT, SWP_SHOWWINDOW);
     pButton = (CButton*)GetDlgItem(IDC_CANCEL);
     pButton->SetWindowTextA(_T("退出"));
     pButton->SetWindowPos(&wndTop, BUTTON_LEFT, 
@@ -383,31 +462,55 @@ void CChsChessDlg::initChessData(void)
 
     //初始化棋子图片
     m_PieceImageList[JU_RIGHT_RED] = m_PieceImageList[JU_LEFT_RED] = ::new Gdiplus::Image(L"res\\红车.png");
+    int st = m_PieceImageList[JU_LEFT_RED]->GetLastStatus();
     m_PieceImageList[MA_RIGHT_RED] = m_PieceImageList[MA_LEFT_RED] = ::new Gdiplus::Image(L"res\\红马.png");
+    st = st + m_PieceImageList[MA_LEFT_RED]->GetLastStatus();
     m_PieceImageList[PAO_RIGHT_RED] = m_PieceImageList[PAO_LEFT_RED] = ::new Gdiplus::Image(L"res\\红砲.png");
+    st = st + m_PieceImageList[PAO_RIGHT_RED]->GetLastStatus();
     m_PieceImageList[XIANG_RIGHT_RED] = m_PieceImageList[XIANG_LEFT_RED] = ::new Gdiplus::Image(L"res\\红相.png");
+    st = st + m_PieceImageList[XIANG_RIGHT_RED]->GetLastStatus();
     m_PieceImageList[SHI_RIGHT_RED] = m_PieceImageList[SHI_LEFT_RED] = ::new Gdiplus::Image(L"res\\红仕.png");
-
+    st = st + m_PieceImageList[SHI_RIGHT_RED]->GetLastStatus();
     m_PieceImageList[JU_RIGHT_BLACK] = m_PieceImageList[JU_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑车.png");
+    st = st + m_PieceImageList[JU_RIGHT_BLACK]->GetLastStatus();
     m_PieceImageList[MA_RIGHT_BLACK] = m_PieceImageList[MA_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑马.png");
+    st = st + m_PieceImageList[MA_RIGHT_BLACK]->GetLastStatus();
     m_PieceImageList[PAO_RIGHT_BLACK] = m_PieceImageList[PAO_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑炮.png");
+    st = st + m_PieceImageList[PAO_RIGHT_BLACK]->GetLastStatus();
     m_PieceImageList[XIANG_RIGHT_BLACK] = m_PieceImageList[XIANG_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑象.png");
+    st = st + m_PieceImageList[XIANG_RIGHT_BLACK]->GetLastStatus();
     m_PieceImageList[SHI_RIGHT_BLACK] = m_PieceImageList[SHI_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑士.png");
+    st = st + m_PieceImageList[SHI_RIGHT_BLACK]->GetLastStatus();
 
     m_PieceImageList[SHUAI_RED]  = ::new Gdiplus::Image(L"res\\红帅.png");
+    st = st + m_PieceImageList[SHUAI_RED]->GetLastStatus();
     m_PieceImageList[JIANG_BLACK]  = ::new Gdiplus::Image(L"res\\黑将.png");
+    st = st + m_PieceImageList[JIANG_BLACK]->GetLastStatus();
 
     m_PieceImageList[BING_ONE_RED] = m_PieceImageList[BING_TWO_RED] = m_PieceImageList[BING_THREE_RED]
         = m_PieceImageList[BING_FOUR_RED] = m_PieceImageList[BING_FIVE_RED] = ::new Gdiplus::Image(L"res\\红兵.png");
+    st = st + m_PieceImageList[BING_FIVE_RED]->GetLastStatus();
 
     m_PieceImageList[ZU_ONE_BLACK] = m_PieceImageList[ZU_TWO_BLACK] = m_PieceImageList[ZU_THREE_BLACK]
         = m_PieceImageList[ZU_FOUR_BLACK] = m_PieceImageList[ZU_FIVE_BLACK] = ::new Gdiplus::Image(L"res\\黑卒.png");
+    st = st + m_PieceImageList[ZU_FIVE_BLACK]->GetLastStatus();
 
     m_PieceImageList[TABLE]  = ::new Gdiplus::Image(L"res\\棋盘.png");
+    st = st + m_PieceImageList[TABLE]->GetLastStatus();
     m_PieceImageList[POS_SRC]  = ::new Gdiplus::Image(L"res\\初始位.png");
+    st = st + m_PieceImageList[POS_SRC]->GetLastStatus();
     m_PieceImageList[POS_DES]  = ::new Gdiplus::Image(L"res\\目标位.png");
+    st = st + m_PieceImageList[POS_DES]->GetLastStatus();
 
     m_CachedTable = ::new Gdiplus::Image(L"res\\棋盘.png");
+    st = st + m_CachedTable->GetLastStatus();
+
+    if(0 != st)
+    {
+        // The constructor was successful. Use myImage.
+        ::MessageBox(m_hWnd, _T("资源初始化失败！"), _T("游戏结束"), MB_ICONERROR|MB_OK);
+        CDialog::OnCancel();
+    }
 
 }
 
@@ -508,60 +611,14 @@ void CChsChessDlg::showMatchView(void)
     graphics.DrawImage(m_CachedTable, 0, 0);
 }
 
-
-
-void CChsChessDlg::OnBnClickedButtonDraw()
+//清空打谱信息
+void CChsChessDlg::clearManual(void)
 {
-    if(NULL == m_pMatch)
-    {
-        return;
-    }
-
-    ::MessageBox(m_hWnd, sEndInfo[0], _T("游戏结束"), MB_OK);
-    m_pMatch->finish();
-    m_pMatch = NULL;
-    initMatchView();
-    showMatchView();
+    CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_MANUAL);
+    pList->ResetContent();
 }
 
-void CChsChessDlg::OnBnClickedButtonFail()
-{
-    if(NULL == m_pMatch)
-    {
-        return;
-    }
 
-    ::MessageBox(m_hWnd, sEndInfo[ RED == m_pMatch->getGoSide() ? BLACK : RED ], _T("游戏结束"), MB_OK);
-    m_pMatch->finish();
-    m_pMatch = NULL;
-    initMatchView();
-    showMatchView();
-}
 
-void CChsChessDlg::OnBnClickedButtonBack()
-{
-    if(NULL == m_pMatch)
-    {
-        return;
-    }
 
-    TStepInfo step = m_pMatch->goBack();
 
-    if(0 != step.m_iDesPiece)
-    {
-        drawBlankTable();
-        drawPieces();
-
-        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
-        int cx = m_PointRectMap[step.m_Src.row][step.m_Src.col].x;
-        int cy = m_PointRectMap[step.m_Src.row][step.m_Src.col].y;
-        graphics->DrawImage(m_PieceImageList[POS_SRC], cx, cy);
-        cx = m_PointRectMap[step.m_Des.row][step.m_Des.col].x;
-        cy = m_PointRectMap[step.m_Des.row][step.m_Des.col].y;
-        graphics->DrawImage(m_PieceImageList[POS_DES], cx, cy);
-        delete graphics;
-
-        showMatchView();
-    }
-
-}

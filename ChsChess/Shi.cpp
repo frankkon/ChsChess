@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+//#include "vld.h"
 #include "Shi.h"
 
 #include <cmath>

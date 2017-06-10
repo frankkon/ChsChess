@@ -45,12 +45,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Visual Leak Detector\include&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -68,6 +69,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;C:\Program Files\Visual Leak Detector\lib\Win32&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -214,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Manual.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Match.cpp"
 				>
 			</File>
@@ -289,6 +295,10 @@
 			</File>
 			<File
 				RelativePath=".\Ma.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Manual.h"
 				>
 			</File>
 			<File

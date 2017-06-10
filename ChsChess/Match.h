@@ -2,15 +2,19 @@
 
 #include <vector>
 #include <stack>
+#include <string>
 
 #include "Log.h"
 #include "ChnChessTable.h"
+#include "Manual.h"
 
 class CPiece;
 
 #define NORMAL_BUF_SIZE       128
 
-static const char* sEndInfo[3] = {"和棋！啦啦啦！", "红方胜！耶耶耶！", "黑方胜！哦哦哦！"};
+static const char* sEndInfo[3] = { _T("和棋！啦啦啦！"), _T("红方胜！耶耶耶！"), _T("黑方胜！哦哦哦！") };
+
+//class CManual;
 
 class CMatch
 {
@@ -48,6 +52,10 @@ public:
     //获取走棋方信息
     int getGoSide();
 
+    //获取当前一步的打谱
+    std::string getCurrentManual();
+
+
 private:
     //棋盘
     CChnChessTable m_vTable;
@@ -57,6 +65,9 @@ private:
 
     //走棋历史
     std::stack<TStepInfo> m_stackHistory;
+
+    //记录棋谱
+    CManual m_stackManual;
 
     //走棋方标识
     int m_iGoSide;

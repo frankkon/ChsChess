@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+//#include "vld.h"
 #include "ChsChess.h"
 #include "ChsChessDlg.h"
 

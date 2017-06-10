@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-
+//#include "vld.h"
 #include <iostream>
 #include <ctime>
 #include <cstdio> 
@@ -14,6 +14,7 @@
 #include "Shuai.h"
 #include "Xiang.h"
 #include "Bing.h"
+#include "Manual.h"
 
 
 CMatch::CMatch(void):m_vPieces(33),m_iGoSide(RED)
@@ -50,7 +51,7 @@ bool CMatch::init()
 
     //初始化比赛日志文件
     char sMatchLogFile[NORMAL_BUF_SIZE + 1] = {0};
-    sprintf(sMatchLogFile, "match%s.txt", m_sMatchID);
+    sprintf_s(sMatchLogFile, NORMAL_BUF_SIZE, "match%s.txt", m_sMatchID);
     m_logMatch.openLogFile(sMatchLogFile);
 
     m_logMatch.logInfo("棋局开始");
@@ -163,12 +164,16 @@ bool CMatch::init()
 
     pPiece = NULL;
 
-    //if(binitResult)
-    //{
-    //    m_vTable.print();
-    //}
+    if(binitResult)
+    {
+		m_logMatch.logInfo("初始化棋子完成。");
+        //_vTable.print();
+    }
+    else
+    {
+		m_logMatch.logInfo("初始化棋子失败。");
+    }
 
-    m_logMatch.logInfo("初始化棋子完成");
     return binitResult;
 }
 
@@ -241,6 +246,7 @@ void CMatch::saveToHistory(TStepInfo step)
     m_logMatch.logDebug("进入CMatch::saveToHistory函数");
     m_logMatch.logInfo("保存走棋步骤");
     m_stackHistory.push(step);
+    m_stackManual.push(step);
 }
 
 bool CMatch::isEnd(int iType)
@@ -296,6 +302,7 @@ TStepInfo CMatch::goBack()
     //将最近一步棋出栈
     TStepInfo step = m_stackHistory.top();
     m_stackHistory.pop();
+    m_stackManual.pop();
 
     //更新棋子位置属性
     CPiece* tmpPtrPiece = getPieceByName(step.m_iDesPiece);
@@ -343,7 +350,7 @@ void CMatch::clean()
 {
     m_iGoSide = RED;
     memset(m_sMatchID, 0, sizeof(m_sMatchID));
-    m_logMatch.closeLogFile();
+    //m_logMatch.closeLogFile();//不需要显式关闭，自动析构
     m_vTable.clean();
 
     for(size_t i = 0; i < m_vPieces.size(); i++)
@@ -358,8 +365,8 @@ void CMatch::clean()
     while(!m_stackHistory.empty())
     {
         m_stackHistory.pop();
+        m_stackManual.pop();
     }
-
 }
 
 void CMatch::finish()
@@ -405,7 +412,7 @@ void CMatch::createMatchID()
 
     srand((unsigned)time(NULL));
     int iRandom = (double)rand() / (RAND_MAX + 1) * (9999 - 1000) + 1000;
-    sprintf(m_sMatchID, "%s%4d", m_sMatchID, iRandom);
+    sprintf_s(m_sMatchID, NORMAL_BUF_SIZE, "%s%4d", m_sMatchID, iRandom);
 
 }
 
@@ -418,4 +425,13 @@ int CMatch::getGoSide()
 {
     return m_iGoSide;
 }
+
+//获取当前一步的打谱
+std::string CMatch::getCurrentManual()
+{
+    return m_stackManual.top();
+}
+
+
+
 
