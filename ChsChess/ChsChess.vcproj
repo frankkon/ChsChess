@@ -417,6 +417,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Lisence.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\ReadMe.txt"
 			>
 		</File>

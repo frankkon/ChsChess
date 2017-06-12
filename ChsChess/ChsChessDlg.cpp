@@ -10,10 +10,11 @@
 #include "Piece.h"
 #include "ChnChessTable.h"
 
-
-#ifdef _DEBUG
-    #define new DEBUG_NEW
-#endif
+//下面的调试代码和GDI+不兼容，报如下错误
+//error C2660: 'Gdiplus::GdiplusBase::operator new' : function does not take 3 parameters
+//#ifdef _DEBUG
+//    #define new DEBUG_NEW
+//#endif
 
 
 // CChsChessDlg 对话框
@@ -102,7 +103,8 @@ BOOL CChsChessDlg::OnInitDialog()
     SetIcon(m_hIcon, FALSE);        // 设置小图标
 
     // 设置窗口的位置,高度包含了标题栏的高度
-    SetWindowPos(&wndTop, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_SHOWWINDOW);
+    //SetWindowPos(&wndTop, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_SHOWWINDOW);
+    SetWindowPos(NULL, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_NOZORDER);
 
     //初始化软件界面
     initUI();
@@ -273,11 +275,28 @@ BOOL CChsChessDlg::DestroyWindow()
         delete m_CachedTable;
         m_CachedTable = NULL;
     }
+
     if(NULL != m_PieceImageList)
     {
+        delete m_PieceImageList[JU_LEFT_RED];
+        delete m_PieceImageList[MA_RIGHT_RED];
+        delete m_PieceImageList[PAO_RIGHT_RED];
+        delete m_PieceImageList[XIANG_RIGHT_RED];
+        delete m_PieceImageList[SHI_RIGHT_RED];
+        delete m_PieceImageList[JU_RIGHT_BLACK];
+        delete m_PieceImageList[MA_RIGHT_BLACK];
+        delete m_PieceImageList[PAO_RIGHT_BLACK];
+        delete m_PieceImageList[XIANG_RIGHT_BLACK];
+        delete m_PieceImageList[SHI_RIGHT_BLACK];
+        delete m_PieceImageList[SHUAI_RED];
+        delete m_PieceImageList[JIANG_BLACK];
+        delete m_PieceImageList[BING_ONE_RED];
+        delete m_PieceImageList[ZU_ONE_BLACK];
+        delete m_PieceImageList[TABLE];
+        delete m_PieceImageList[POS_SRC];
+        delete m_PieceImageList[POS_DES];
         for(int i = 1; i < 1+32+3; i++)
         {
-            delete m_PieceImageList[i];
             m_PieceImageList[i] = NULL;
         }
     }
@@ -461,48 +480,48 @@ void CChsChessDlg::initChessData(void)
     }
 
     //初始化棋子图片
-    m_PieceImageList[JU_RIGHT_RED] = m_PieceImageList[JU_LEFT_RED] = ::new Gdiplus::Image(L"res\\红车.png");
+    m_PieceImageList[JU_RIGHT_RED] = m_PieceImageList[JU_LEFT_RED] = new Gdiplus::Image(L"res\\红车.png");
     int st = m_PieceImageList[JU_LEFT_RED]->GetLastStatus();
-    m_PieceImageList[MA_RIGHT_RED] = m_PieceImageList[MA_LEFT_RED] = ::new Gdiplus::Image(L"res\\红马.png");
+    m_PieceImageList[MA_RIGHT_RED] = m_PieceImageList[MA_LEFT_RED] = new Gdiplus::Image(L"res\\红马.png");
     st = st + m_PieceImageList[MA_LEFT_RED]->GetLastStatus();
-    m_PieceImageList[PAO_RIGHT_RED] = m_PieceImageList[PAO_LEFT_RED] = ::new Gdiplus::Image(L"res\\红砲.png");
+    m_PieceImageList[PAO_RIGHT_RED] = m_PieceImageList[PAO_LEFT_RED] = new Gdiplus::Image(L"res\\红砲.png");
     st = st + m_PieceImageList[PAO_RIGHT_RED]->GetLastStatus();
-    m_PieceImageList[XIANG_RIGHT_RED] = m_PieceImageList[XIANG_LEFT_RED] = ::new Gdiplus::Image(L"res\\红相.png");
+    m_PieceImageList[XIANG_RIGHT_RED] = m_PieceImageList[XIANG_LEFT_RED] = new Gdiplus::Image(L"res\\红相.png");
     st = st + m_PieceImageList[XIANG_RIGHT_RED]->GetLastStatus();
-    m_PieceImageList[SHI_RIGHT_RED] = m_PieceImageList[SHI_LEFT_RED] = ::new Gdiplus::Image(L"res\\红仕.png");
+    m_PieceImageList[SHI_RIGHT_RED] = m_PieceImageList[SHI_LEFT_RED] = new Gdiplus::Image(L"res\\红仕.png");
     st = st + m_PieceImageList[SHI_RIGHT_RED]->GetLastStatus();
-    m_PieceImageList[JU_RIGHT_BLACK] = m_PieceImageList[JU_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑车.png");
+    m_PieceImageList[JU_RIGHT_BLACK] = m_PieceImageList[JU_LEFT_BLACK] = new Gdiplus::Image(L"res\\黑车.png");
     st = st + m_PieceImageList[JU_RIGHT_BLACK]->GetLastStatus();
-    m_PieceImageList[MA_RIGHT_BLACK] = m_PieceImageList[MA_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑马.png");
+    m_PieceImageList[MA_RIGHT_BLACK] = m_PieceImageList[MA_LEFT_BLACK] = new Gdiplus::Image(L"res\\黑马.png");
     st = st + m_PieceImageList[MA_RIGHT_BLACK]->GetLastStatus();
-    m_PieceImageList[PAO_RIGHT_BLACK] = m_PieceImageList[PAO_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑炮.png");
+    m_PieceImageList[PAO_RIGHT_BLACK] = m_PieceImageList[PAO_LEFT_BLACK] = new Gdiplus::Image(L"res\\黑炮.png");
     st = st + m_PieceImageList[PAO_RIGHT_BLACK]->GetLastStatus();
-    m_PieceImageList[XIANG_RIGHT_BLACK] = m_PieceImageList[XIANG_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑象.png");
+    m_PieceImageList[XIANG_RIGHT_BLACK] = m_PieceImageList[XIANG_LEFT_BLACK] = new Gdiplus::Image(L"res\\黑象.png");
     st = st + m_PieceImageList[XIANG_RIGHT_BLACK]->GetLastStatus();
-    m_PieceImageList[SHI_RIGHT_BLACK] = m_PieceImageList[SHI_LEFT_BLACK] = ::new Gdiplus::Image(L"res\\黑士.png");
+    m_PieceImageList[SHI_RIGHT_BLACK] = m_PieceImageList[SHI_LEFT_BLACK] = new Gdiplus::Image(L"res\\黑士.png");
     st = st + m_PieceImageList[SHI_RIGHT_BLACK]->GetLastStatus();
 
-    m_PieceImageList[SHUAI_RED]  = ::new Gdiplus::Image(L"res\\红帅.png");
+    m_PieceImageList[SHUAI_RED]  = new Gdiplus::Image(L"res\\红帅.png");
     st = st + m_PieceImageList[SHUAI_RED]->GetLastStatus();
-    m_PieceImageList[JIANG_BLACK]  = ::new Gdiplus::Image(L"res\\黑将.png");
+    m_PieceImageList[JIANG_BLACK]  = new Gdiplus::Image(L"res\\黑将.png");
     st = st + m_PieceImageList[JIANG_BLACK]->GetLastStatus();
 
     m_PieceImageList[BING_ONE_RED] = m_PieceImageList[BING_TWO_RED] = m_PieceImageList[BING_THREE_RED]
-        = m_PieceImageList[BING_FOUR_RED] = m_PieceImageList[BING_FIVE_RED] = ::new Gdiplus::Image(L"res\\红兵.png");
+        = m_PieceImageList[BING_FOUR_RED] = m_PieceImageList[BING_FIVE_RED] = new Gdiplus::Image(L"res\\红兵.png");
     st = st + m_PieceImageList[BING_FIVE_RED]->GetLastStatus();
 
     m_PieceImageList[ZU_ONE_BLACK] = m_PieceImageList[ZU_TWO_BLACK] = m_PieceImageList[ZU_THREE_BLACK]
-        = m_PieceImageList[ZU_FOUR_BLACK] = m_PieceImageList[ZU_FIVE_BLACK] = ::new Gdiplus::Image(L"res\\黑卒.png");
+        = m_PieceImageList[ZU_FOUR_BLACK] = m_PieceImageList[ZU_FIVE_BLACK] = new Gdiplus::Image(L"res\\黑卒.png");
     st = st + m_PieceImageList[ZU_FIVE_BLACK]->GetLastStatus();
 
-    m_PieceImageList[TABLE]  = ::new Gdiplus::Image(L"res\\棋盘.png");
+    m_PieceImageList[TABLE]  = new Gdiplus::Image(L"res\\棋盘.png");
     st = st + m_PieceImageList[TABLE]->GetLastStatus();
-    m_PieceImageList[POS_SRC]  = ::new Gdiplus::Image(L"res\\初始位.png");
+    m_PieceImageList[POS_SRC]  = new Gdiplus::Image(L"res\\初始位.png");
     st = st + m_PieceImageList[POS_SRC]->GetLastStatus();
-    m_PieceImageList[POS_DES]  = ::new Gdiplus::Image(L"res\\目标位.png");
+    m_PieceImageList[POS_DES]  = new Gdiplus::Image(L"res\\目标位.png");
     st = st + m_PieceImageList[POS_DES]->GetLastStatus();
 
-    m_CachedTable = ::new Gdiplus::Image(L"res\\棋盘.png");
+    m_CachedTable = new Gdiplus::Image(L"res\\棋盘.png");
     st = st + m_CachedTable->GetLastStatus();
 
     if(0 != st)

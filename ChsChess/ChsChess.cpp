@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-//#include "vld.h"
+#include "vld.h"
 #include "ChsChess.h"
 #include "ChsChessDlg.h"
 
@@ -33,7 +33,9 @@ CChsChessApp theApp;
 // CChsChessApp 初始化
 BOOL CChsChessApp::InitInstance()
 {
-	// 如果一个运行在 Windows XP 上的应用程序清单指定要
+    //_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+
+    // 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	// 则需要 InitCommonControlsEx()。否则，将无法创建窗口。
 	INITCOMMONCONTROLSEX InitCtrls;
