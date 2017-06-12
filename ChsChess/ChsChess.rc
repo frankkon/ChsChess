@@ -115,14 +115,15 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "TODO: <文件说明>"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "Comments", "中国象棋"
+            VALUE "CompanyName", "孔俊"
+            VALUE "FileDescription", "中国象棋"
+            VALUE "FileVersion", "1.0.1"
             VALUE "InternalName", "ChsChess.exe"
-            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "LegalCopyright", "孔俊保留所有权利。"
             VALUE "OriginalFilename", "ChsChess.exe"
-            VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductName", "中国象棋"
+            VALUE "ProductVersion", "1.0.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -150,27 +151,6 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BITMAP_BLACK_JU     BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑车.bmp"
-IDB_BITMAP_BLACK_JIANG  BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑将.bmp"
-IDB_BITMAP_BLACK_MA     BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑马.bmp"
-IDB_BITMAP_BLACK_PAO    BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑炮.bmp"
-IDB_BITMAP_BLACK_SHI    BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑士.bmp"
-IDB_BITMAP_BLACK_XIANG  BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑象.bmp"
-IDB_BITMAP_BLACK_ZU     BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\黑卒.bmp"
-IDB_BITMAP_RED_BING     BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红兵.bmp"
-IDB_BITMAP_RED_JU       BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红车.bmp"
-IDB_BITMAP_RED_MA       BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红马.bmp"
-IDB_BITMAP_RED_PAO      BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红砲.bmp"
-IDB_BITMAP_RED_SHI      BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红仕.bmp"
-IDB_BITMAP_RED_SHUAI    BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红帅.bmp"
-IDB_BITMAP_RED_XIANG    BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\红相.bmp"
-IDB_BITMAP_TABLE        BITMAP                  "D:\\Projects\\Source\\CodeCenter\\ChineseChess\\棋子图片\\QQ2\\棋盘.bmp"
 #endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 

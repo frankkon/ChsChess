@@ -4,21 +4,6 @@
 //
 #define IDD_CHSCHESS_DIALOG             102
 #define IDR_MAINFRAME                   128
-#define IDB_BITMAP_BLACK_JU             129
-#define IDB_BITMAP_BLACK_JIANG          130
-#define IDB_BITMAP_BLACK_MA             131
-#define IDB_BITMAP_BLACK_PAO            132
-#define IDB_BITMAP_BLACK_SHI            133
-#define IDB_BITMAP_BLACK_XIANG          134
-#define IDB_BITMAP_BLACK_ZU             135
-#define IDB_BITMAP_RED_BING             136
-#define IDB_BITMAP_RED_JU               137
-#define IDB_BITMAP_RED_MA               138
-#define IDB_BITMAP_RED_PAO              139
-#define IDB_BITMAP_RED_SHI              140
-#define IDB_BITMAP_RED_SHUAI            141
-#define IDB_BITMAP_RED_XIANG            142
-#define IDB_BITMAP_TABLE                143
 #define IDC_CANCEL                      1001
 #define IDC_BUTTON_START                1002
 #define IDC_BUTTON_HE                   1003
