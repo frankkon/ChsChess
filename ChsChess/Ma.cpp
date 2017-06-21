@@ -80,3 +80,9 @@ bool CMa::move(TPosition desPos, CMatch* pMatch)
 
     return false;
 }
+
+
+
+
+
+

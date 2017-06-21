@@ -31,3 +31,9 @@ public:
     void logError(const char* strLog);
 
 };
+
+
+
+
+
+

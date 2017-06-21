@@ -104,3 +104,7 @@ int CChnChessTable::getPieceNameByPos(TPosition pos)
 {
     return iArrChnChessTable[pos.row][pos.col];
 }
+
+
+
+

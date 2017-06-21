@@ -15,3 +15,8 @@ private:
     bool m_bIsCrossRiver;
     int m_iStepCount;
 };
+
+
+
+
+

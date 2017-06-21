@@ -36,3 +36,13 @@ bool CShuai::move(TPosition desPos, CMatch* pMatch)
     //std::cout<<"无效走棋位置("<<desPos.row<<","<<desPos.col<<")"<<std::endl;
     return false;
 }
+
+
+
+
+
+
+
+
+
+

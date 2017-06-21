@@ -139,3 +139,12 @@ bool CPao::move(TPosition desPos, CMatch* pMatch)
     return CPiece::move(desPos, pMatch);
 }
 
+
+
+
+
+
+
+
+
+

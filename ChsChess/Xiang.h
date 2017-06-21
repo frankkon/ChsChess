@@ -11,3 +11,12 @@ public:
 
     virtual bool move(TPosition desPos, CMatch* pMatch);
 };
+
+
+
+
+
+
+
+
+

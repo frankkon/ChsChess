@@ -82,3 +82,9 @@ int CChsChessApp::ExitInstance()
 
     return CWinAppEx::ExitInstance();
 }
+
+
+
+
+
+

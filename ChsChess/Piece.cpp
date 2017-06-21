@@ -76,3 +76,15 @@ bool CPiece::IsValidMove(CPiece* pPiece, TPosition desPos, CMatch* pMatch)
 
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+

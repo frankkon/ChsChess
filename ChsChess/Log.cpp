@@ -81,3 +81,8 @@ void CLog::logError(const char* strLog)
     }
 }
 
+
+
+
+
+

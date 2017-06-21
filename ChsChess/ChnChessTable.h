@@ -67,3 +67,10 @@ private:
     int iArrChnChessTable[MAX_ROW][MAX_COL];
     
 };
+
+
+
+
+
+
+

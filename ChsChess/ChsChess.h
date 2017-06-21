@@ -36,3 +36,7 @@ public:
 extern CChsChessApp theApp;
 
 
+
+
+
+

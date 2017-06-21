@@ -68,3 +68,7 @@ bool CBing::move(TPosition desPos, CMatch* pMatch)
     return false;
 }
 
+
+
+
+
