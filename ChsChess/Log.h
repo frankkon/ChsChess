@@ -19,7 +19,7 @@ private:
 
 public:
     CLog(void);
-    CLog(const char* strFilename);
+    explicit CLog(const char* strFilename);
     ~CLog(void);
 
     void setLogLevel(int iLogLevel);

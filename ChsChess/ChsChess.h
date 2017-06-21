@@ -34,3 +34,5 @@ public:
 };
 
 extern CChsChessApp theApp;
+
+

@@ -61,10 +61,9 @@ protected:
     afx_msg HCURSOR OnQueryDragIcon();
 
     DECLARE_MESSAGE_MAP()
-
-    virtual BOOL OnInitDialog();
     virtual void OnOK();
     virtual void OnCancel();
+
 
 public:
     afx_msg void OnBnClickedCancel();
@@ -74,6 +73,7 @@ public:
     afx_msg void OnBnClickedButtonFail();
     afx_msg void OnBnClickedButtonBack();
 
+    virtual BOOL OnInitDialog();
     virtual BOOL DestroyWindow();
 
     //ª≠ø’∆Â≈Ã

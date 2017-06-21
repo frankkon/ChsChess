@@ -46,12 +46,12 @@
 
 CChsChessDlg::CChsChessDlg(CWnd* pParent /*=NULL*/)
     : CDialog(CChsChessDlg::IDD, pParent),
+      m_bClickedFlag(false),
       m_pMatch(NULL),
-      m_CachedTable(NULL),
-      m_iSelectedPieceName(NO_PIECE)
+      m_iSelectedPieceName(NO_PIECE),
+      m_CachedTable(NULL)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-    m_bClickedFlag = false;
 
     for(int i = 0; i < 1+32+3; i++)
     {
@@ -104,7 +104,10 @@ BOOL CChsChessDlg::OnInitDialog()
 
     // 设置窗口的位置,高度包含了标题栏的高度
     //SetWindowPos(&wndTop, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_SHOWWINDOW);
-    SetWindowPos(NULL, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_NOZORDER);
+    if( FALSE == SetWindowPos(NULL, 0, 0, TABLE_WIDTH + 200, TABLE_HEIGHT + 30, SWP_NOZORDER) )
+    {
+        TRACE( _T("设置窗体位置失败。") );
+    }
 
     //初始化软件界面
     initUI();
@@ -134,7 +137,10 @@ void CChsChessDlg::OnPaint()
         int y = (rect.Height() - cyIcon + 1) / 2;
 
         // 绘制图标
-        dc.DrawIcon(x, y, m_hIcon);
+        if(FALSE == dc.DrawIcon(x, y, m_hIcon))
+        {
+            TRACE( _T("绘制图标失败。") );
+        }
     }
     else
     {
@@ -167,7 +173,11 @@ void CChsChessDlg::OnCancel()
 void CChsChessDlg::OnBnClickedCancel()
 {
     TRACE("CChsChessDlg::OnBnClickedCancel()\n");
-    CDialog::OnCancel();
+
+    if( IDYES == ::MessageBox(m_hWnd, _T("确定要离开游戏吗？"), _T("确认离开"),  MB_YESNO) )
+    {
+        CDialog::OnCancel();
+    }
 }
 
 void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
@@ -213,6 +223,7 @@ void CChsChessDlg::OnLButtonUp(UINT nFlags, CPoint point)
                 CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_MANUAL);
                 std::string sManual = m_pMatch->getCurrentManual();
                 pList->InsertString(-1, sManual.c_str());
+                pList->SetCurSel(pList->GetCount() - 1);
 
                 //重绘棋盘
                 m_bClickedFlag = false;
@@ -387,18 +398,11 @@ void CChsChessDlg::OnBnClickedButtonBack()
             pList->DeleteString(pList->GetCount() - 1);
         }
 
-        drawBlankTable();
-        drawPieces();
-
-        Gdiplus::Graphics* graphics = Gdiplus::Graphics::FromImage(m_CachedTable); 
-        int cx = m_PointRectMap[step.m_Src.row][step.m_Src.col].x;
-        int cy = m_PointRectMap[step.m_Src.row][step.m_Src.col].y;
-        graphics->DrawImage(m_PieceImageList[POS_SRC], cx, cy);
-        cx = m_PointRectMap[step.m_Des.row][step.m_Des.col].x;
-        cy = m_PointRectMap[step.m_Des.row][step.m_Des.col].y;
-        graphics->DrawImage(m_PieceImageList[POS_DES], cx, cy);
-        delete graphics;
-
+        m_ptSrcOfActPiece.x = m_PointRectMap[step.m_Src.row][step.m_Src.col].x;
+        m_ptSrcOfActPiece.y = m_PointRectMap[step.m_Src.row][step.m_Src.col].y;
+        m_ptDesOfActPiece.x = m_PointRectMap[step.m_Des.row][step.m_Des.col].x;
+        m_ptDesOfActPiece.y = m_PointRectMap[step.m_Des.row][step.m_Des.col].y;
+		updateTable();
         showMatchView();
     }
 

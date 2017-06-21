@@ -51,14 +51,14 @@ bool CMatch::init()
 
     //初始化比赛日志文件
     char sMatchLogFile[NORMAL_BUF_SIZE + 1] = {0};
-    sprintf_s(sMatchLogFile, NORMAL_BUF_SIZE, "match%s.txt", m_sMatchID);
+    sprintf_s(sMatchLogFile, NORMAL_BUF_SIZE, _T("match%s.txt"), m_sMatchID);
     m_logMatch.openLogFile(sMatchLogFile);
 
-    m_logMatch.logInfo("棋局开始");
+    m_logMatch.logInfo( _T("棋局开始") );
 
     //初始化棋盘
     m_vTable.init();
-    m_logMatch.logInfo("初始化棋盘完成");
+    m_logMatch.logInfo( _T("初始化棋盘完成") );
 
     //初始化棋子
     CPiece* pPiece = NULL;
@@ -166,12 +166,12 @@ bool CMatch::init()
 
     if(binitResult)
     {
-		m_logMatch.logInfo("初始化棋子完成。");
+		m_logMatch.logInfo( _T("初始化棋子完成。") );
         //_vTable.print();
     }
     else
     {
-		m_logMatch.logInfo("初始化棋子失败。");
+		m_logMatch.logInfo( _T("初始化棋子失败。") );
     }
 
     return binitResult;
@@ -179,7 +179,7 @@ bool CMatch::init()
 
 bool CMatch::go(int iPieceName, TPosition pos)
 {
-    m_logMatch.logDebug("进入CMatch::go函数");
+    m_logMatch.logDebug( _T("进入CMatch::go函数") );
     CPiece* pPiece = m_vPieces[iPieceName];
     if(NULL == pPiece)
     {
@@ -189,7 +189,7 @@ bool CMatch::go(int iPieceName, TPosition pos)
     //检查是否本方走棋
     if(m_iGoSide != pPiece->getType())
     {
-        m_logMatch.logInfo("对方走棋");
+        m_logMatch.logInfo( _T("对方走棋") );
         return false;
     }
 
@@ -204,7 +204,7 @@ bool CMatch::go(int iPieceName, TPosition pos)
         //如果是吃子，把被吃的子的位置移到棋盘外。
         if(NO_PIECE != step.m_iDesPiece)
         {
-            m_logMatch.logInfo("将被吃的子的位置移到棋盘外");
+            m_logMatch.logInfo( _T("将被吃的子的位置移到棋盘外") );
             CPiece* tmpPtrPiece = getPieceByName(step.m_iDesPiece);
             if(NULL != tmpPtrPiece)
             {
@@ -243,15 +243,15 @@ bool CMatch::go(int iPieceName, TPosition pos)
 
 void CMatch::saveToHistory(TStepInfo step)
 {
-    m_logMatch.logDebug("进入CMatch::saveToHistory函数");
-    m_logMatch.logInfo("保存走棋步骤");
+    m_logMatch.logDebug( _T("进入CMatch::saveToHistory函数") );
+    m_logMatch.logInfo( _T("保存走棋步骤") );
     m_stackHistory.push(step);
     m_stackManual.push(step);
 }
 
 bool CMatch::isEnd(int iType)
 {
-    m_logMatch.logDebug("进入CMatch::isEnd函数");
+    m_logMatch.logDebug( _T("进入CMatch::isEnd函数") );
 
     //如果iType对方的帅不在棋盘上了，则结束
     CPiece* tmpPtrPiece = NULL;
@@ -282,7 +282,7 @@ bool CMatch::isEnd(int iType)
     }
     else
     {
-        m_logMatch.logError("程序异常");
+        m_logMatch.logError( _T("程序异常") );
     }
 
     return true;
@@ -290,7 +290,7 @@ bool CMatch::isEnd(int iType)
 
 TStepInfo CMatch::goBack()
 {
-    m_logMatch.logDebug("进入CMatch::goBack函数");
+    m_logMatch.logDebug( _T("进入CMatch::goBack函数") );
 
     if(m_stackHistory.empty())
     {
@@ -327,11 +327,11 @@ TStepInfo CMatch::goBack()
 
 bool CMatch::initPiece(int iName, int iType, int iRow, int iCol, CPiece* pPiece)
 {
-    m_logMatch.logDebug("进入CMatch::initPiece函数");
+    m_logMatch.logDebug( _T("进入CMatch::initPiece函数") );
 
     if( NULL == pPiece)
     {
-        m_logMatch.logInfo("初始化棋子失败");
+        m_logMatch.logInfo( _T("初始化棋子失败") );
         return false;
     }
 
@@ -371,8 +371,8 @@ void CMatch::clean()
 
 void CMatch::finish()
 {
-    m_logMatch.logDebug("进入CMatch::finish函数");
-    m_logMatch.logInfo("棋局结束");
+    m_logMatch.logDebug( _T("进入CMatch::finish函数") );
+    m_logMatch.logInfo( _T("棋局结束") );
 
     if(NULL != this)
     {
@@ -383,21 +383,21 @@ void CMatch::finish()
 
 void CMatch::swapGoSide(int iType)
 {
-    m_logMatch.logDebug("进入CMatch::swapGoSide函数");
+    m_logMatch.logDebug( _T("进入CMatch::swapGoSide函数") );
 
     if(RED == iType)
     {
-        m_logMatch.logInfo("轮到黑方走");
+        m_logMatch.logInfo( _T("轮到黑方走") );
         m_iGoSide = BLACK;
     }
     else if(BLACK == iType)
     {
-        m_logMatch.logInfo("轮到红方走");
+        m_logMatch.logInfo( _T("轮到红方走") );
         m_iGoSide = RED;
     }
     else
     {
-        m_logMatch.logError("程序异常");
+        m_logMatch.logError( _T("程序异常") );
     }
 }
 
@@ -408,11 +408,11 @@ void CMatch::createMatchID()
     time_t nowtime = time(0);
     struct tm _tm;
     localtime_s(&_tm, &nowtime);
-    strftime(m_sMatchID, NORMAL_BUF_SIZE, "%Y%m%d%H%M%S", &_tm); 
+    strftime(m_sMatchID, NORMAL_BUF_SIZE, _T("%Y%m%d%H%M%S"), &_tm); 
 
     srand((unsigned)time(NULL));
     int iRandom = (double)rand() / (RAND_MAX + 1) * (9999 - 1000) + 1000;
-    sprintf_s(m_sMatchID, NORMAL_BUF_SIZE, "%s%4d", m_sMatchID, iRandom);
+    sprintf_s(m_sMatchID, NORMAL_BUF_SIZE, _T("%s%4d"), m_sMatchID, iRandom);
 
 }
 
